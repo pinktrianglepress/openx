@@ -1,12 +1,4 @@
 ; $Id$
-name = OpenX Adserver Integration
-description = "Integrates the OpenX adserver into drupal"
-core = 6.x
-package = Advertising
-
-
-; Information added by drupal.org packaging script on 2008-04-25
-version = "6.x-1.0"
-core = "6.x"
-project = "openads"
-datestamp = "1209096315"
+core        = "6.x"
+name        = "OpenX"
+description = "Integrates the OpenX adserver into Drupal"

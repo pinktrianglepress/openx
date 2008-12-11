@@ -55,8 +55,3 @@ Where [index] is the number of one of your zones, that is 0, 1, etc. You may als
 <?php print openx_invoke("leaderboard top"); ?>
 
 The module will take care to generate the according JavaScript after validate if to show ads to the user logged in
-
-
-SPONSORS
-========
-This module was sponsored by Ambiweb GmbH, http://www.ambiweb.de
