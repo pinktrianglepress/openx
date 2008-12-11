@@ -13,8 +13,16 @@
  * Module settings page form.
  */
 function _openx_settings() {
+  $form['blocks'] = array(
+    '#description'  => t('<ul>
+        <li>'. t('The zone ID can be found in the OpenX administration interface.') .'</li>
+        <li>'. t('The name can be any alpha-numeric string, this will be used for the block name.') .'</li>
+    </ul>'),
+    '#title'        => t('OpenX blocks'),
+    '#type'         => 'fieldset',
+  );
   $zones_num = variable_get('openx_num_zones', 3);
-  $form['openx_num_zones'] = array(
+  $form['blocks']['openx_num_zones'] = array(
     '#default_value'  => $zones_num,
     '#description'    => t('How many OpenX zones (blocks) do you wish to display?'),
     '#title'          => t('OpenX Zones'),
@@ -22,24 +30,18 @@ function _openx_settings() {
     '#size'           => 6,
   );
 
-  $form['openx_zones'] = array(
-    '#description'  => t("<ul>
-        <li>The zone id can be found in the OpenX administration interface.</li>
-        <li>The name can be any alpha-numeric string, this will be used for the block name.</li>
-    </ul>"),
-    '#theme'        => 'openx_settings_zones',
-    '#title'        => t('OpenX blocks'),
+  $form['blocks']['openx_zones'] = array(
     '#tree'         => TRUE,
-    '#type'         => 'fieldset',
+    '#theme'        => 'openx_settings_zones',
   );
   $zones = variable_get('openx_zones', array());
-  for ($index = 0; $zones_num; $index++) {
-    $form['openx_zones'][$index]['id'] = array(
+  for ($index = 0; $index < $zones_num; $index++) {
+    $form['blocks']['openx_zones'][$index]['id'] = array(
       '#type'           => 'textfield',
       '#default_value'  => $zones[$index]['id'],
       '#size'           => 6,
     );
-    $form['openx_zones'][$index]['name'] = array(
+    $form['blocks']['openx_zones'][$index]['name'] = array(
       '#type'           => 'textfield',
       '#default_value'  => $zones[$index]['name'],
       '#size'           => 20,
@@ -47,9 +49,11 @@ function _openx_settings() {
   }
 
   $form['adserver'] = array(
+    '#collapsible'    => TRUE,
+    '#collapsed'      => variable_get('openx_delivery_url', FALSE),
     '#type'           => 'fieldset',
     '#title'          => t('OpenX server'),
-    '#description'    => t('These settings are located on your OpenX server at <strong>Settings -> Main Settings -> Delivery Settings</strong><br />...or leave blank to use an OpenX hosted account'),
+    '#description'    => t('These settings are located on your OpenX server at <strong>Settings -> Main Settings -> Delivery Settings</strong><br />'),
   );
   $form['adserver']['openx_delivery_url'] = array(
     '#type'           => 'textfield',
