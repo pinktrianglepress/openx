@@ -19,22 +19,3 @@ function openx_uninstall() {
   variable_del('openx_num_zones');
   variable_del('openx_zone');
 }
-
-/**
- * Implementation of hook_uninstall().
- */
-function openx_update_6001() {
-  $zones_num = variable_get('openx_num_zones', 3);
-  for ($index = 1; $zones_num; $index++) {
-    $zones[] = array(
-      'id'    => variable_get('openx_zones_id_'. $index, ''),
-      'name'  => variable_get('openx_zones_name_'. $index, '')
-    );
-    variable_del('openx_zones_id_'. $index);
-    variable_del('openx_zones_name_'. $index);
-  }
-  variable_set('openx_zones', $zones);
-
-  $update = array();
-  return $update;
-}
