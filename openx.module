@@ -42,13 +42,13 @@ function openx_block($op = 'list', $delta = 0, $edit = array()) {
  */
 function openx_help($section, $arg = NULL) {
   switch ($section) {
-  case 'admin/help#openx':
-  case 'admin/modules#description':
-    return '<p>'. t('The OpenX module allows site administrators to integrate Drupal with the OpenX adserver.
-      OpenX ad zones that are configured to be used in with openx module can be shown anywhere
-      in a theme directly using a function call or via Drupal blocks which are automatically
-      created for each OpenX ad zone. Additional information regarding OpenX can be found at the
-      <a href="http://www.openx.org">OpenX website</a>.') .'</p>';
+    case 'admin/help#openx':
+    case 'admin/modules#description':
+      return '<p>'. t('The OpenX module allows site administrators to integrate Drupal with the OpenX adserver.
+        OpenX ad zones that are configured to be used in with openx module can be shown anywhere
+        in a theme directly using a function call or via Drupal blocks which are automatically
+        created for each OpenX ad zone. Additional information regarding OpenX can be found at the
+        <a href="http://www.openx.org">OpenX website</a>.') .'</p>';
   }
 }
 
@@ -88,6 +88,11 @@ function openx_theme() {
 
 /**
  * Builds the call to OpenX
+ *
+ * @param $index_or_key
+ *   Number or String. The zone ID number or the it's 'nickname'
+ * @return
+ *   HTML. The area where the banner will be displayed
  */
 function openx_invoke($index_or_key) {
   module_load_include('inc', 'openx');
