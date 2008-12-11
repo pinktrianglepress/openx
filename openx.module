@@ -1,31 +1,40 @@
 <?php
 // $Id$
+
 /**
  * @author Gerd Riesselmann
  * @author Jeff Warrington (jaydub) is new maintainer March 2008
  * @author Chris Nutting <Chris.Nutting@openx.org>
  * @author Bruno Massa
+ *
  * @file
  * Integrates Drupal with OpenX Ad server
  */
 
 /**
- * Implementation of hook_theme().
+ * Implementation of hook_block().
  */
-function openx_theme() {
-  return array(
-    'openx_settings_zones' => array(
-      'file'      => 'openx.admin.inc',
-      'arguments' => array('form')
-    ),
-    'openx_block' => array(
-      'file'      => 'openx.inc',
-      'arguments' => array('index')
-    ),
-    'openx_channel' => array(
-      'arguments' => array()
-    ),
-  );
+function openx_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $zones = variable_get('openx_zones', array());
+    foreach ($zones as $index => $zone) {
+      if ($zone['id']) {
+        $blocks[$index] = array(
+          'info'    => t('OpenX Zone !id (!name)', array('!id' => $zone['id'], '!name' => (empty($zone['name']) ? t('untitled') : $zone['name']))),
+          'weight'  => 0,
+          'enabled' => 0,
+          'region'  => 'left'
+        );
+      }
+    }
+    return $blocks;
+  }
+  elseif ($op == 'view') {
+    $block = array(
+      'content' => openx_invoke($delta)
+    );
+    return $block;
+  }
 }
 
 /**
@@ -59,29 +68,22 @@ function openx_menu() {
 }
 
 /**
- * Implementation of hook_block().
+ * Implementation of hook_theme().
  */
-function openx_block($op = 'list', $delta = 0, $edit = array()) {
-  if ($op == 'list') {
-    $zones = variable_get('openx_zones', array());
-    foreach ($zones as $index => $zone) {
-      if ($zone['id']) {
-        $blocks[$index] = array(
-          'info'    => t('OpenX Zone !id (!name)', array('!id' => $zone['id'], '!name' => (empty($zone['name']) ? t('untitled') : $zone['name']))),
-          'weight'  => 0,
-          'enabled' => 0,
-          'region'  => 'left'
-        );
-      }
-    }
-    return $blocks;
-  }
-  elseif ($op == 'view') {
-    $block = array(
-      'content' => openx_invoke($delta)
-    );
-    return $block;
-  }
+function openx_theme() {
+  return array(
+    'openx_settings_zones' => array(
+      'file'      => 'openx.admin.inc',
+      'arguments' => array('form')
+    ),
+    'openx_block' => array(
+      'file'      => 'openx.inc',
+      'arguments' => array('index')
+    ),
+    'openx_channel' => array(
+      'arguments' => array()
+    ),
+  );
 }
 
 /**
