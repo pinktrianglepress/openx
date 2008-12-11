@@ -1,0 +1,40 @@
+<?php
+// $Id$
+/**
+ * @author Gerd Riesselmann
+ * @author Jeff Warrington (jaydub) is new maintainer March 2008
+ * @author Chris Nutting <Chris.Nutting@openx.org>
+ * @author Bruno Massa
+ * @file
+ * Install, uninstall and update processes.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function openx_uninstall() {
+  // Delete global variables
+  variable_del('openx_delivery_url');
+  variable_del('openx_delivery_url_https');
+  variable_del('openx_num_zones');
+  variable_del('openx_zone');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function openx_update_6001() {
+  $zones_num = variable_get('openx_num_zones', 3);
+  for ($index = 1; $zones_num; $index++) {
+    $zones[] = array(
+      'id'    => variable_get('openx_zones_id_'. $index, ''),
+      'name'  => variable_get('openx_zones_name_'. $index, '')
+    );
+    variable_del('openx_zones_id_'. $index);
+    variable_del('openx_zones_name_'. $index);
+  }
+  variable_set('openx_zones', $zones);
+
+  $update = array();
+  return $update;
+}
