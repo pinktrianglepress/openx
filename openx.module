@@ -48,13 +48,12 @@ function openx_help($section, $arg = NULL) {
  */
 function openx_menu() {
   $items['admin/settings/openx'] = array(
-    'access callback'   => 'user_access',
     'access arguments'  => array('administer site configuration'),
-    'description'       => 'Configure OpenX (openx) AdServer integration behavior and appearance.',
-    'page callback'     => 'drupal_get_form',
+    'description'       => 'Configure OpenX AdServer integration behavior and appearance.',
     'file'              => 'openx.admin.inc',
+    'page callback'     => 'drupal_get_form',
     'page arguments'    => array('_openx_settings'),
-    'title'             => 'OpenX (openx) adserver configuration',
+    'title'             => 'OpenX',
   );
   return $items;
 }
