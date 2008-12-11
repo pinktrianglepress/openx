@@ -1,12 +1,14 @@
 <?php
 // $Id$
+
 /**
  * @author Gerd Riesselmann
  * @author Jeff Warrington (jaydub) is new maintainer March 2008
  * @author Chris Nutting <Chris.Nutting@openx.org>
  * @author Bruno Massa
+ *
  * @file
- * Openx Block display.
+ * Module settings.
  */
 
 /**
