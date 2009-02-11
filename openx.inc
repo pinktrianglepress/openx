@@ -15,6 +15,13 @@
  * Insert the JavaScript into the page's header.
  */
 function _openx_javascript() {
+  static $spc_code;
+
+  // No need to add the header more than once
+  if (!empty($spc_code)) {
+    return;
+  }
+
   if (!empty($_SERVER['HTTPS'])) {
     $protocol = 'https';
     $server = variable_get('openx_delivery_url_https', 'd.openx.org');
