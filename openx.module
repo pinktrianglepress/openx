@@ -23,7 +23,8 @@ function openx_block($op = 'list', $delta = 0, $edit = array()) {
           'info'    => t('OpenX Zone !id (!name)', array('!id' => $zone['id'], '!name' => (empty($zone['name']) ? t('untitled') : $zone['name']))),
           'weight'  => 0,
           'enabled' => 0,
-          'region'  => 'left'
+          'region'  => 'left',
+          'cache'   => BLOCK_NO_CACHE
         );
       }
     }
