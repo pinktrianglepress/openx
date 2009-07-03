@@ -17,8 +17,8 @@
 function _openx_settings() {
   $form['blocks'] = array(
     '#description'  => t('<ul>
-        <li>'. t('The zone ID can be found in the OpenX administration interface.') .'</li>
-        <li>'. t('The name can be any alpha-numeric string, this will be used for the block name.') .'</li>
+        <li>' . t('The zone ID can be found in the OpenX administration interface.') . '</li>
+        <li>' . t('The name can be any alpha-numeric string, this will be used for the block name.') . '</li>
     </ul>'),
     '#title'        => t('OpenX blocks'),
     '#type'         => 'fieldset',
@@ -40,12 +40,12 @@ function _openx_settings() {
   for ($index = 0; $index < $zones_num; $index++) {
     $form['blocks']['openx_zones'][$index]['id'] = array(
       '#type'           => 'textfield',
-      '#default_value'  => $zones[$index]['id'],
+      '#default_value'  => isset($zones[$index]['id']) ? $zones[$index]['id'] : '',
       '#size'           => 6,
     );
     $form['blocks']['openx_zones'][$index]['name'] = array(
       '#type'           => 'textfield',
-      '#default_value'  => $zones[$index]['name'],
+      '#default_value'  => isset($zones[$index]['name']) ? $zones[$index]['name'] : '',
       '#size'           => 20,
     );
   }
@@ -83,7 +83,6 @@ function theme_openx_settings_zones($form) {
   foreach (element_children($form) as $zone) {
     $rows[] = array($zone, drupal_render($form[$zone]['id']), drupal_render($form[$zone]['name']));
   }
-  $output .= theme('table', $header, $rows);
 
-  return $output;
+  return theme('table', $header, $rows);
 }

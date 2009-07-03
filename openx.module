@@ -12,30 +12,32 @@
  */
 
 /**
- * Implementation of hook_block().
+ * Implementation of hook_block_list().
  */
-function openx_block($op = 'list', $delta = 0, $edit = array()) {
-  if ($op == 'list') {
-    $zones = variable_get('openx_zones', array());
-    foreach ($zones as $index => $zone) {
-      if ($zone['id']) {
-        $blocks[$index] = array(
-          'info'    => t('OpenX Zone !id (!name)', array('!id' => $zone['id'], '!name' => (empty($zone['name']) ? t('untitled') : $zone['name']))),
-          'weight'  => 0,
-          'enabled' => 0,
-          'region'  => 'left',
-          'cache'   => BLOCK_NO_CACHE
-        );
-      }
+function openx_block_list($delta = 0, $edit = array()) {
+  $zones = variable_get('openx_zones', array());
+  foreach ($zones as $index => $zone) {
+    if ($zone['id']) {
+      $blocks[$index] = array(
+        'info'    => t('OpenX Zone !id (!name)', array('!id' => $zone['id'], '!name' => (empty($zone['name']) ? t('untitled') : $zone['name']))),
+        'weight'  => 0,
+        'enabled' => 0,
+        'region'  => 'left',
+        'cache'   => BLOCK_NO_CACHE
+      );
     }
-    return $blocks;
   }
-  elseif ($op == 'view') {
-    $block = array(
-      'content' => openx_invoke($delta)
-    );
-    return $block;
-  }
+  return $blocks;
+}
+
+/**
+ * Implementation of hook_block_view().
+ */
+function openx_block_view($delta = 0, $edit = array()) {
+  $block = array(
+    'content' => openx_invoke($delta)
+  );
+  return $block;
 }
 
 /**
@@ -45,11 +47,11 @@ function openx_help($section, $arg = NULL) {
   switch ($section) {
     case 'admin/help#openx':
     case 'admin/modules#description':
-      return '<p>'. t('The OpenX module allows site administrators to integrate Drupal with the OpenX adserver.
+      return '<p>' . t('The OpenX module allows site administrators to integrate Drupal with the OpenX adserver.
         OpenX ad zones that are configured to be used in with openx module can be shown anywhere
         in a theme directly using a function call or via Drupal blocks which are automatically
         created for each OpenX ad zone. Additional information regarding OpenX can be found at the
-        <a href="http://www.openx.org">OpenX website</a>.') .'</p>';
+        <a href="http://www.openx.org">OpenX website</a>.') . '</p>';
   }
 }
 
