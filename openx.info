@@ -1,4 +1,3 @@
-; $Id$
 core        = "7.x"
 name        = "OpenX"
 description = "Integrates the OpenX adserver into Drupal"
