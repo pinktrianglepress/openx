@@ -13,7 +13,7 @@
 /**
  * Module settings page form.
  */
-function _openx_settings() {
+function _openx_settings($form, &$form_state) {
   $form['blocks'] = array(
     '#description'  => t('<ul>
         <li>' . t('The zone ID can be found in the OpenX administration interface.') . '</li>
@@ -21,33 +21,57 @@ function _openx_settings() {
     </ul>'),
     '#title'        => t('OpenX blocks'),
     '#type'         => 'fieldset',
-  );
-  $zones_num = variable_get('openx_num_zones', 3);
-  $form['blocks']['openx_num_zones'] = array(
-    '#default_value'  => $zones_num,
-    '#description'    => t('How many OpenX zones (blocks) do you wish to display?'),
-    '#title'          => t('OpenX Zones'),
-    '#type'           => 'textfield',
-    '#size'           => 6,
+    '#prefix' => '<div id="zones-wrapper">',
+    '#suffix' => '</div>'
   );
 
   $form['blocks']['openx_zones'] = array(
     '#tree'         => TRUE,
     '#theme'        => 'openx_settings_zones',
   );
-  $zones = variable_get('openx_zones', array());
-  for ($index = 0; $index < $zones_num; $index++) {
+
+  if (empty($form_state['zones'])) {
+    $zones = variable_get('openx_zones', array());
+    if (empty($zones)) {
+      $form_state['zones'] = array_fill(0, 3, array('id' => '', 'name' => ''));
+    }
+    else {
+      $form_state['zones'] = $zones;
+    }
+  }
+
+  foreach ($form_state['zones'] as $index => $zone) {
+    $form['blocks']['openx_zones'][$index]['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+      '#submit' => array('_openx_settings_delete_zone'),
+      '#ajax' => array(
+        'callback' => '_openx_settings_add_zone_callback',
+        'wrapper' => 'zones-wrapper',
+      ),
+      '#zone_id' => $index,
+      '#name' => 'delete-zone-' . $index,
+    );
     $form['blocks']['openx_zones'][$index]['id'] = array(
       '#type'           => 'textfield',
-      '#default_value'  => isset($zones[$index]['id']) ? $zones[$index]['id'] : '',
+      '#default_value'  => isset($form_state['zones'][$index]['id']) ? $form_state['zones'][$index]['id'] : '',
       '#size'           => 6,
     );
     $form['blocks']['openx_zones'][$index]['name'] = array(
       '#type'           => 'textfield',
-      '#default_value'  => isset($zones[$index]['name']) ? $zones[$index]['name'] : '',
-      '#size'           => 20,
+      '#default_value'  => isset($form_state['zones'][$index]['name']) ? $form_state['zones'][$index]['name'] : '',
     );
   }
+
+  $form['blocks']['add_zone'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add zone'),
+    '#submit' => array('_openx_settings_add_zone'),
+    '#ajax' => array(
+      'callback' => '_openx_settings_add_zone_callback',
+      'wrapper' => 'zones-wrapper'
+    ),
+  );
 
   $form['adserver'] = array(
     '#collapsible'    => TRUE,
@@ -74,14 +98,32 @@ function _openx_settings() {
   return system_settings_form($form);
 }
 
+function _openx_settings_add_zone_callback($form, &$form_state) {
+  return $form['blocks'];
+}
+
+function _openx_settings_add_zone($form, &$form_state) {
+  $form_state['zones'][] = array('id' => '', 'name' => '');
+  $form_state['rebuild'] = TRUE;
+}
+
+function _openx_settings_delete_zone($form, &$form_state) {
+  unset($form_state['zones'][$form_state['clicked_button']['#zone_id']]);
+  if (count($form_state['zones']) < 3) {
+    $form_state['zones'][] = array('id' => '', 'name' => '');
+  }
+  $form_state['rebuild'] = TRUE;
+}
+
 /**
  * Theme the OpenX blocks list as a table
  */
-function theme_openx_settings_zones($form) {
-  $header = array(t('Index'), t('Zone ID'), t('Block name'));
+function theme_openx_settings_zones($variables) {
+  $form =& $variables['form'];
+  $header = array(t('Zone ID'), t('Block name'), '');
   foreach (element_children($form) as $zone) {
-    $rows[] = array($zone, drupal_render($form[$zone]['id']), drupal_render($form[$zone]['name']));
+    $rows[] = array(drupal_render($form[$zone]['id']), drupal_render($form[$zone]['name']), drupal_render($form[$zone]['delete']));
   }
 
-  return theme('table', $header, $rows);
+  return theme('table', array('header' => $header, 'rows' => $rows));
 }

@@ -32,7 +32,7 @@ function _openx_javascript() {
   $url = $protocol . '://' . trim($server, '/') . '/spcjs.php';
 
   $zones = variable_get('openx_zones', array());
-  $spc_code = "<script type='text/javascript'><!--// <![CDATA[\n  var OA_zones = {\n";
+  $script = "  var OA_zones = {\n";
 
   $js_zones = array();
   foreach ($zones as $idx => $zone) {
@@ -40,10 +40,29 @@ function _openx_javascript() {
       $js_zones[] = "    '" . $zone['name'] . "' : " . $zone['id'];
     }
   }
-  $spc_code .= implode(",\n", $js_zones);
-  $spc_code .= "  }\n// ]]> --></script>\n<script type='text/javascript' src='{$url}'></script>";
+  $script .= implode(",\n", $js_zones);
+  $script .= "\n  }";
 
-  drupal_add_html_head($spc_code);
+  $spc_code = array();
+  drupal_add_html_head(array(
+    '#type' => 'html_tag',
+    '#tag' => 'script',
+    '#attributes' => array(
+      'type' => 'text/javascript',
+    ),
+    '#value' => $script,
+    '#weight' => 1000,
+  ), 'openx_zones');
+  drupal_add_html_head(array(
+    '#type' => 'html_tag',
+    '#tag' => 'script',
+    '#attributes' => array(
+      'type' => 'text/javascript',
+      'src' => $url,
+    ),
+    '#value' => '',
+    '#weight' => 1001,
+  ), 'openx_script');
 }
 
 /**

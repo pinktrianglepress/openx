@@ -11,18 +11,14 @@
  */
 
 /**
- * Implementation of hook_block_list().
+ * Implements hook_block_info().
  */
-function openx_block_list($delta = 0, $edit = array()) {
+function openx_block_info() {
   $zones = variable_get('openx_zones', array());
   foreach ($zones as $index => $zone) {
     if ($zone['id']) {
       $blocks[$index] = array(
         'info'    => t('OpenX Zone !id (!name)', array('!id' => $zone['id'], '!name' => (empty($zone['name']) ? t('untitled') : $zone['name']))),
-        'weight'  => 0,
-        'enabled' => 0,
-        'region'  => 'left',
-        'cache'   => BLOCK_NO_CACHE
       );
     }
   }
@@ -30,9 +26,9 @@ function openx_block_list($delta = 0, $edit = array()) {
 }
 
 /**
- * Implementation of hook_block_view().
+ * Implements hook_block_view().
  */
-function openx_block_view($delta = 0, $edit = array()) {
+function openx_block_view($delta = '') {
   $block = array(
     'content' => openx_invoke($delta)
   );
@@ -40,7 +36,7 @@ function openx_block_view($delta = 0, $edit = array()) {
 }
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function openx_help($section, $arg = NULL) {
   switch ($section) {
@@ -55,35 +51,37 @@ function openx_help($section, $arg = NULL) {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function openx_menu() {
-  $items['admin/settings/openx'] = array(
-    'access arguments'  => array('administer site configuration'),
-    'description'       => 'Configure OpenX AdServer integration behavior and appearance.',
-    'file'              => 'openx.admin.inc',
-    'page callback'     => 'drupal_get_form',
-    'page arguments'    => array('_openx_settings'),
-    'title'             => 'OpenX',
+  $items['admin/config/openx'] = array(
+    'title' => 'OpenX',
+    'position' => 'right',
+    'weight' => -10,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+  $items['admin/config/openx/settings'] = array(
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Configure OpenX AdServer integration behavior and appearance.',
+    'file' => 'openx.admin.inc',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_openx_settings'),
+    'title' => 'Settings',
   );
   return $items;
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function openx_theme() {
   return array(
     'openx_settings_zones' => array(
       'file'      => 'openx.admin.inc',
-      'arguments' => array('form')
-    ),
-    'openx_block' => array(
-      'file'      => 'openx.inc',
-      'arguments' => array('index')
-    ),
-    'openx_channel' => array(
-      'arguments' => array()
+      'render element' => 'form',
     ),
   );
 }
