@@ -128,7 +128,7 @@ function _openx_settings_submit(&$form, &$form_state) {
   unset($form_state['storage']);
 }
 
-function _openx_settings_add_zone_callback($form, &$form_state) {
+function _openx_settings_site_vars_clean(&$form, &$form_state) {
   $errors = FALSE;
 
   $site_vars = $form_state['values']['openx_site_vars'];
