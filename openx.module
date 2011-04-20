@@ -74,14 +74,18 @@ function openx_theme() {
   return array(
     'openx_settings_zones' => array(
       'file'      => 'openx.admin.inc',
-      'arguments' => array('form')
+      'arguments' => array('form' => array()),
     ),
     'openx_block' => array(
       'file'      => 'openx.inc',
-      'arguments' => array('index')
+      'arguments' => array('index' => NULL),
     ),
     'openx_channel' => array(
       'arguments' => array()
+    ),
+    'openx_site_vars' => array(
+      'arguments' => array('form' => array()),
+      'file' => 'openx.admin.inc',
     ),
   );
 }

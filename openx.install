@@ -18,5 +18,6 @@ function openx_uninstall() {
   variable_del('openx_delivery_url');
   variable_del('openx_delivery_url_https');
   variable_del('openx_num_zones');
+  variable_del('openx_site_vars');
   variable_del('openx_zone');
 }

@@ -14,6 +14,7 @@
  * Insert the JavaScript into the page's header.
  */
 function _openx_javascript() {
+  global $user;
   static $spc_code;
 
   // No need to add the header more than once
@@ -30,6 +31,31 @@ function _openx_javascript() {
     $server = variable_get('openx_delivery_url', 'd.openx.org');
   }
   $url = $protocol .'://'. trim($server, '/') .'/spcjs.php';
+  
+  if ($site_vars = variable_get('openx_site_vars', FALSE)) {    
+    $vars = array();
+    if (module_exists('token')) {
+      $objects = array('global' => NULL, 'user' => $user);
+      
+      $node = menu_get_object('node');
+      
+      if (isset($node)) {
+        $objects['node'] = $node;
+      }
+    }
+    foreach ($site_vars as $var) {
+      if (module_exists('token')) {
+        $vars[$var['key']] = token_replace_multiple($var['value'], $objects, '[', ']', array('clear' => TRUE));
+      }
+      else {
+        $vars[$var['key']] = $var['value'];
+      }
+    }
+    
+    if (!empty($vars)) {
+      $url .= '?' . drupal_query_string_encode($vars);
+    }
+  }
 
   $zones = variable_get('openx_zones', array());
   $spc_code = "<script type='text/javascript'><!--// <![CDATA[\n  var OA_zones = {\n";
