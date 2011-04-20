@@ -82,7 +82,26 @@ function theme_openx_settings_zones($form) {
   foreach (element_children($form) as $zone) {
     $rows[] = array($zone, drupal_render($form[$zone]['id']), drupal_render($form[$zone]['name']));
   }
-  $output .= theme('table', $header, $rows);
+  $output = theme('table', $header, $rows);
 
   return $output;
+}
+
+function theme_openx_site_vars($form) {
+  $head = array(
+    t('Variable'),
+    t('Value'),
+    '',
+  );
+  $rows = array();
+  
+  foreach (element_children($form) as $key) {
+    $rows[] = array(
+      drupal_render($form[$key]['key']),
+      drupal_render($form[$key]['value']),
+      drupal_render($form[$key]['delete']),
+    );
+  }
+  
+  return theme('table', $head, $rows);
 }
