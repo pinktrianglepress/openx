@@ -73,6 +73,55 @@ function _openx_settings($form, &$form_state) {
     ),
   );
 
+  $form['targeting'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Site Variables'),
+    '#description' => t('Specify site variables to allow OpenX to target ads to particular pages.'),
+  );
+  
+  $form_state['site_vars'] = isset($form_state['site_vars']) ? $form_state['site_vars'] : variable_get('openx_site_vars', array_fill(0, 3, array('key' => '', 'value' => '')));
+  if (empty($form_state['site_vars'])) {
+    $form_state['site_vars'] = array_fill(0, 3, array('key' => '', 'value' => ''));
+  }
+  $form['targeting']['openx_site_vars'] = array(
+     '#tree' => TRUE,
+     '#element_validate' => array('_openx_admin_site_vars_clean'),
+     '#theme' => 'openx_site_vars',
+     '#prefix' => '<div id="openx-site-vars-wrapper">',
+     '#suffix' => '</div>',
+  );
+  
+  foreach ($form_state['site_vars'] as $key => $vars) {
+    $form['targeting']['openx_site_vars'][$key]['key'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $vars['key'],
+      '#size' => 16,
+    );
+    $form['targeting']['openx_site_vars'][$key]['value'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $vars['value'],
+      '#size' => 64,
+    );
+    $form['targeting']['openx_site_vars'][$key]['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('delete'),
+      '#submit' => array('_openx_settings_del_variable'),
+      '#name' => 'openx-site-vars-delete-' . $key,
+      '#key' => $key,
+      '#disabled' => count($form_state['site_vars']) == 1,
+    );
+  }
+  
+  $form['targeting']['add_row'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add variable'),
+    '#submit' => array('_openx_settings_add_variable'),
+  );
+  $form['targeting']['token_vars_tree'] = array(
+    '#theme' => 'token_tree',
+    '#token_types' => array('node', 'user'),
+  );
+
   $form['adserver'] = array(
     '#collapsible'    => TRUE,
     '#collapsed'      => variable_get('openx_delivery_url', FALSE),
@@ -82,20 +131,25 @@ function _openx_settings($form, &$form_state) {
   );
   $form['adserver']['openx_delivery_url'] = array(
     '#type'           => 'textfield',
-    '#default_value'  => variable_get('openx_delivery_url', 'd.openx.org'),
+    '#default_value'  => isset($form_state['values']['openx_delivery_url']) ? $form_state['values']['openx_delivery_url'] : variable_get('openx_delivery_url', 'd.openx.org'),
     '#title'          => t('OpenX delivery url'),
     '#description'    => t('For example "ads.example.org/delivery". "http://" is automatically prefixed.'),
     '#required'       => TRUE,
   );
   $form['adserver']['openx_delivery_url_https'] = array(
     '#type'           => 'textfield',
-    '#default_value'  => variable_get('openx_delivery_url_https', 'd.openx.org'),
+    '#default_value'  => isset($form_state['values']['openx_delivery_url_https']) ? $form_state['values']['openx_delivery_url_https'] : variable_get('openx_delivery_url_https', 'd.openx.org'),
     '#title'          => t('OpenX https delivery url'),
     '#description'    => t('For example "ads.example.org/delivery". "https://" is automatically prefixed.'),
     '#required'       => TRUE,
   );
 
+  $form['#submit'] = array('_openx_settings_submit');
   return system_settings_form($form);
+}
+
+function _openx_settings_submit(&$form, &$form_state) {
+  unset($form_state['storage']);
 }
 
 function _openx_settings_add_zone_callback($form, &$form_state) {
@@ -115,6 +169,35 @@ function _openx_settings_delete_zone($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
+function _openx_admin_site_vars_clean(&$form, &$form_state) {
+  $errors = FALSE;
+
+  $site_vars = $form_state['values']['openx_site_vars'];
+  foreach ($site_vars as $key => $var) {
+    if (empty($var['key']) && empty($var['value'])) {
+      unset($site_vars[$key]);
+    }
+    elseif (empty($var['key']) && !empty($var['value'])) {
+      $errors = TRUE;
+      form_error($form[$key]['key'], t('Key field is required when there is a value present'));
+    }
+  }
+  
+  if (!$errors) {
+    form_set_value($form, $site_vars, $form_state);
+  }
+}
+
+function _openx_settings_del_variable(&$form, &$form_state) {
+  unset($form_state['site_vars'][$form_state['clicked_button']['#key']]);
+  $form_state['rebuild'] = 1;
+}
+
+function _openx_settings_add_variable(&$form, &$form_state) {
+  $form_state['site_vars'][] = array('key' => '', 'value' => '');
+  $form_state['rebuild'] = 1;
+}
+
 /**
  * Theme the OpenX blocks list as a table
  */
@@ -122,8 +205,28 @@ function theme_openx_settings_zones($variables) {
   $form =& $variables['form'];
   $header = array(t('Zone ID'), t('Block name'), '');
   foreach (element_children($form) as $zone) {
-    $rows[] = array(drupal_render($form[$zone]['id']), drupal_render($form[$zone]['name']), drupal_render($form[$zone]['delete']));
+    $rows[] = array(
+      drupal_render($form[$zone]['id']),
+      drupal_render($form[$zone]['name']),
+      drupal_render($form[$zone]['delete'])
+    );
   }
 
+  return theme('table', array('header' => $header, 'rows' => $rows));
+}
+
+function theme_openx_site_vars($variables) {
+  $form =& $variables['form'];
+  $header = array(t('Variable'), t('Value'), '');
+  $rows = array();
+  
+  foreach (element_children($form) as $key) {
+    $rows[] = array(
+      drupal_render($form[$key]['key']),
+      drupal_render($form[$key]['value']),
+      drupal_render($form[$key]['delete']),
+    );
+  }
+  
   return theme('table', array('header' => $header, 'rows' => $rows));
 }
