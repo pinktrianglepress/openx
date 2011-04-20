@@ -61,7 +61,7 @@ function _openx_settings(&$form_state) {
   }
   $form['targeting']['openx_site_vars'] = array(
      '#tree' => TRUE,
-     '#element_validate' => array('openx_admin_site_vars_clean'),
+     '#element_validate' => array('_openx_admin_site_vars_clean'),
      '#theme' => 'openx_site_vars',
      '#prefix' => '<div id="openx-site-vars-wrapper">',
      '#suffix' => '</div>',
