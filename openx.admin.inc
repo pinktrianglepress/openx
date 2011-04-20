@@ -81,7 +81,7 @@ function _openx_settings(&$form_state) {
     $form['targeting']['openx_site_vars'][$key]['delete'] = array(
       '#type' => 'submit',
       '#value' => t('delete'),
-      '#submit' => array('openx_settings_del_variable'),
+      '#submit' => array('_openx_settings_del_variable'),
       '#name' => 'openx-site-vars-delete-' . $key,
       '#key' => $key,
       '#disabled' => count($form_state['storage']['site_vars']) == 1,
@@ -91,7 +91,7 @@ function _openx_settings(&$form_state) {
   $form['targeting']['add_row'] = array(
     '#type' => 'submit',
     '#value' => t('Add variable'),
-    '#submit' => array('openx_settings_add_variable'),
+    '#submit' => array('_openx_settings_add_variable'),
   );
   $form['targeting']['token_vars_tree'] = array(
     '#theme' => 'token_tree',
@@ -120,15 +120,15 @@ function _openx_settings(&$form_state) {
     '#required'       => TRUE,
   );
 
-  $form['#submit'] = array('openx_settings_submit');
+  $form['#submit'] = array('_openx_settings_submit');
   return system_settings_form($form);
 }
 
-function openx_settings_submit(&$form, &$form_state) {
+function _openx_settings_submit(&$form, &$form_state) {
   unset($form_state['storage']);
 }
 
-function openx_admin_site_vars_clean(&$form, &$form_state) {
+function _openx_admin_site_vars_clean(&$form, &$form_state) {
   $errors = FALSE;
 
   $site_vars = $form_state['values']['openx_site_vars'];
@@ -147,13 +147,13 @@ function openx_admin_site_vars_clean(&$form, &$form_state) {
   }
 }
 
-function openx_settings_del_variable(&$form, &$form_state) {
+function _openx_settings_del_variable(&$form, &$form_state) {
   $form_state['storage']['site_vars'] = $form_state['values']['openx_site_vars'];
   unset($form_state['storage']['site_vars'][$form_state['clicked_button']['#key']]);
   $form_state['rebuild'] = 1;
 }
 
-function openx_settings_add_variable(&$form, &$form_state) {
+function _openx_settings_add_variable(&$form, &$form_state) {
   $form_state['storage']['site_vars'] = $form_state['values']['openx_site_vars'];
   $form_state['storage']['site_vars'][] = array('key' => '', 'value' => '');
   $form_state['rebuild'] = 1;
