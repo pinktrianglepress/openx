@@ -85,7 +85,7 @@ function _openx_settings($form, &$form_state) {
   }
   $form['targeting']['openx_site_vars'] = array(
      '#tree' => TRUE,
-     '#element_validate' => array('_openx_admin_site_vars_clean'),
+     '#element_validate' => array('_openx_settings_site_vars_clean'),
      '#theme' => 'openx_site_vars',
      '#prefix' => '<div id="openx-site-vars-wrapper">',
      '#suffix' => '</div>',
@@ -169,7 +169,7 @@ function _openx_settings_delete_zone($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
-function _openx_admin_site_vars_clean(&$form, &$form_state) {
+function _openx_settings_site_vars_clean(&$form, &$form_state) {
   $errors = FALSE;
 
   $site_vars = $form_state['values']['openx_site_vars'];
