@@ -109,6 +109,10 @@ function _openx_settings($form, &$form_state) {
       '#name' => 'openx-site-vars-delete-' . $key,
       '#key' => $key,
       '#disabled' => count($form_state['site_vars']) == 1,
+      '#ajax' => array(
+        'callback' => '_openx_settings_add_variable_callback',
+        'wrapper' => 'openx-site-vars-wrapper'
+      ),
     );
   }
   
@@ -116,6 +120,10 @@ function _openx_settings($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Add variable'),
     '#submit' => array('_openx_settings_add_variable'),
+    '#ajax' => array(
+      'callback' => '_openx_settings_add_variable_callback',
+      'wrapper' => 'openx-site-vars-wrapper'
+    ),
   );
   $form['targeting']['token_vars_tree'] = array(
     '#theme' => 'token_tree',
@@ -196,6 +204,10 @@ function _openx_settings_del_variable(&$form, &$form_state) {
 function _openx_settings_add_variable(&$form, &$form_state) {
   $form_state['site_vars'][] = array('key' => '', 'value' => '');
   $form_state['rebuild'] = 1;
+}
+
+function _openx_settings_add_variable_callback($form, &$form_state) {
+  return $form['targeting']['openx_site_vars'];
 }
 
 /**
