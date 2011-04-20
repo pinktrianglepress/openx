@@ -32,7 +32,7 @@ function _openx_javascript() {
   }
   $url = $protocol .'://'. trim($server, '/') .'/spcjs.php';
   
-  if ($site_vars = variable_get('openx_site_vars', FALSE)) {    
+  if ($site_vars = variable_get('openx_site_vars', FALSE)) {
     $vars = array();
     if (module_exists('token')) {
       $objects = array('global' => NULL, 'user' => $user);
@@ -44,11 +44,13 @@ function _openx_javascript() {
       }
     }
     foreach ($site_vars as $var) {
-      if (module_exists('token')) {
-        $vars[$var['key']] = token_replace_multiple($var['value'], $objects, '[', ']', array('clear' => TRUE));
-      }
-      else {
-        $vars[$var['key']] = $var['value'];
+      if (!empty($var['key'])) {
+        if (module_exists('token')) {
+          $vars[$var['key']] = token_replace_multiple($var['value'], $objects, '[', ']', array('clear' => TRUE));
+        }
+        else {
+          $vars[$var['key']] = $var['value'];
+        }
       }
     }
     
