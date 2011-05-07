@@ -141,6 +141,10 @@ function _openx_settings_submit(&$form, &$form_state) {
 function _openx_settings_zones_clean(&$form, &$form_state) {
   $errors = FALSE;
 
+  if (isset($form_state['clicked_button']['#submit'])) {
+    return;
+  }
+  
   $zones = $form_state['values']['openx_zones'];
   foreach ($zones as $key => $var) {
     if (empty($var['id']) && empty($var['name'])) {
@@ -159,6 +163,10 @@ function _openx_settings_zones_clean(&$form, &$form_state) {
 
 function _openx_settings_site_vars_clean(&$form, &$form_state) {
   $errors = FALSE;
+
+  if (isset($form_state['clicked_button']['#submit'])) {
+    return;
+  }
 
   $site_vars = $form_state['values']['openx_site_vars'];
   foreach ($site_vars as $key => $var) {
