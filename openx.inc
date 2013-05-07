@@ -40,7 +40,7 @@ function _openx_javascript() {
       $node = menu_get_object('node');
       
       if (isset($node)) {
-        $objects['node'] = $node;
+        $data['node'] = $node;
       }
     }
     foreach ($site_vars as $var) {
@@ -53,7 +53,7 @@ function _openx_javascript() {
         }
       }
     }
-    
+
     if (!empty($vars)) {
       $url .= '?' . drupal_http_build_query($vars);
     }
@@ -71,7 +71,7 @@ function _openx_javascript() {
   $script .= implode(",\n", $js_zones);
   $script .= "\n  }";
 
-  $spc_code = array();
+  $spc_code = 1;
   drupal_add_html_head(array(
     '#type' => 'html_tag',
     '#tag' => 'script',
@@ -81,16 +81,14 @@ function _openx_javascript() {
     '#value' => $script,
     '#weight' => 1000,
   ), 'openx_zones');
-  drupal_add_html_head(array(
-    '#type' => 'html_tag',
-    '#tag' => 'script',
-    '#attributes' => array(
-      'type' => 'text/javascript',
-      'src' => $url,
-    ),
-    '#value' => '',
-    '#weight' => 1001,
-  ), 'openx_script');
+
+  $jsurl = array(
+    'path' => $url,
+  );
+
+  drupal_add_js(array('openx' => $jsurl), 'setting');
+
+  return $url;
 }
 
 /**

@@ -20,6 +20,7 @@ function openx_block_info() {
     if ($zone['id']) {
       $blocks[$index] = array(
         'info'    => t('OpenX Zone !id (!name)', array('!id' => $zone['id'], '!name' => (empty($zone['name']) ? t('untitled') : $zone['name']))),
+        'cache'   => DRUPAL_NO_CACHE,
       );
     }
   }
@@ -100,15 +101,14 @@ function openx_theme() {
  *   HTML. The area where the banner will be displayed
  */
 function openx_invoke($index_or_key) {
+  static $spc_url;
   module_load_include('inc', 'openx');
   if (!$zone = _openx_get_zone($index_or_key)) {
     return '';
   }
-
-  // Add the JS on top of the page
-  _openx_javascript();
-
-  return "<script type='text/javascript'><!--// <![CDATA[
-    OA_show('{$zone['name']}');
-// ]]> --></script>";
+  if(empty($spc_url)) {
+    $spc_url = _openx_javascript();
+  }
+  return "<div class='lazyload_ad' original='$spc_url'><code style='display:none'>OA_show('{$zone['name']}');</code></div>";
 }
+
