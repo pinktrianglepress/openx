@@ -86,7 +86,7 @@ function _openx_javascript() {
     'path' => $url,
   );
 
-  drupal_add_js(array('openx' => $jsurl), 'setting');
+	drupal_add_js($url, array('type' => 'external', 'scope' => 'footer', 'weight' => 5), 'setting');
 
   return $url;
 }
