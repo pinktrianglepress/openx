@@ -125,6 +125,63 @@ function _openx_settings($form, &$form_state) {
       'wrapper' => 'openx-site-vars-wrapper'
     ),
   );
+
+
+  $form['targeting_cookie'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Cookie Variables'),
+    '#description' => t('Specify client side cookie name to allow OpenX to target ads to particular pages.'),
+  );
+
+
+  $form_state['cookie_vars'] = isset($form_state['cookie_vars']) ? $form_state['cookie_vars'] : variable_get('openx_cookie_vars', array_fill(0, 3, array('key' => '', 'value' => '')));
+  if (empty($form_state['cookie_vars'])) {
+    $form_state['cookie_vars'] = array_fill(0, 3, array('key' => '', 'value' => ''));
+  }
+  $form['targeting_cookie']['openx_cookie_vars'] = array(
+     '#tree' => TRUE,
+     '#element_validate' => array('_openx_settings_cookie_vars_clean'),
+     '#theme' => 'openx_cookie_vars',
+     '#prefix' => '<div id="openx-cookie-vars-wrapper">',
+     '#suffix' => '</div>',
+  );
+
+  foreach ($form_state['cookie_vars'] as $key => $vars) {
+    $form['targeting_cookie']['openx_cookie_vars'][$key]['key'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $vars['key'],
+      '#size' => 16,
+    );
+    $form['targeting_cookie']['openx_cookie_vars'][$key]['value'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $vars['value'],
+      '#size' => 64,
+    );
+    $form['targeting_cookie']['openx_cookie_vars'][$key]['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('delete'),
+      '#submit' => array('_openx_settings_del_variable'),
+      '#name' => 'openx-cookie-vars-delete-' . $key,
+      '#key' => $key,
+      '#disabled' => count($form_state['cookie_vars']) == 1,
+      '#ajax' => array(
+        'callback' => '_openx_settings_add_cookie_variable_callback',
+        'wrapper' => 'openx-cookie-vars-wrapper'
+      ),
+    );
+  }
+
+  $form['targeting_cookie']['add_row'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add cookie variable'),
+    '#submit' => array('_openx_settings_add_cookie_variable'),
+    '#ajax' => array(
+      'callback' => '_openx_settings_add_cookie_variable_callback',
+      'wrapper' => 'openx-cookie-vars-wrapper'
+    ),
+  );
+
+
   $form['targeting']['token_vars_tree'] = array(
     '#theme' => 'token_tree',
     '#token_types' => array('node', 'user'),
@@ -196,6 +253,25 @@ function _openx_settings_site_vars_clean(&$form, &$form_state) {
   }
 }
 
+function _openx_settings_cookie_vars_clean(&$form, &$form_state) {
+  $errors = FALSE;
+
+  $cookie_vars = $form_state['values']['openx_cookie_vars'];
+  foreach ($cookie_vars as $key => $var) {
+    if (empty($var['key']) && empty($var['value'])) {
+      unset($cookie_vars[$key]);
+    }
+    elseif (empty($var['key']) && !empty($var['value'])) {
+      $errors = TRUE;
+      form_error($form[$key]['key'], t('Key field is required when there is a value present'));
+    }
+  }
+  
+  if (!$errors) {
+    form_set_value($form, $cookie_vars, $form_state);
+  }
+}
+
 function _openx_settings_del_variable(&$form, &$form_state) {
   unset($form_state['site_vars'][$form_state['clicked_button']['#key']]);
   $form_state['rebuild'] = 1;
@@ -206,8 +282,17 @@ function _openx_settings_add_variable(&$form, &$form_state) {
   $form_state['rebuild'] = 1;
 }
 
+function _openx_settings_add_cookie_variable(&$form, &$form_state) {
+  $form_state['cookie_vars'][] = array('key' => '', 'value' => '');
+  $form_state['rebuild'] = 1;
+}
+
 function _openx_settings_add_variable_callback($form, &$form_state) {
   return $form['targeting']['openx_site_vars'];
+}
+
+function _openx_settings_add_cookie_variable_callback($form, &$form_state) {
+  return $form['targeting_cookie']['openx_cookie_vars'];
 }
 
 /**
@@ -242,3 +327,20 @@ function theme_openx_site_vars($variables) {
   
   return theme('table', array('header' => $header, 'rows' => $rows));
 }
+
+function theme_openx_cookie_vars($variables) {
+  $form =& $variables['form'];
+  $header = array(t('Variable'), t('Cookie'), '');
+  $rows = array();
+  
+  foreach (element_children($form) as $key) {
+    $rows[] = array(
+      drupal_render($form[$key]['key']),
+      drupal_render($form[$key]['value']),
+      drupal_render($form[$key]['delete']),
+    );
+  }
+  
+  return theme('table', array('header' => $header, 'rows' => $rows));
+}
+

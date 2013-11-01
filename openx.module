@@ -89,6 +89,10 @@ function openx_theme() {
       'render element' => 'form',
       'file' => 'openx.admin.inc',
     ),
+    'openx_cookie_vars' => array(
+      'render element' => 'form',
+      'file' => 'openx.admin.inc',
+    ),
   );
 }
 
