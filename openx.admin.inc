@@ -160,7 +160,7 @@ function _openx_settings($form, &$form_state) {
     $form['targeting_cookie']['openx_cookie_vars'][$key]['delete'] = array(
       '#type' => 'submit',
       '#value' => t('delete'),
-      '#submit' => array('_openx_settings_del_variable'),
+      '#submit' => array('_openx_settings_del_cookie_variable'),
       '#name' => 'openx-cookie-vars-delete-' . $key,
       '#key' => $key,
       '#disabled' => count($form_state['cookie_vars']) == 1,
@@ -274,6 +274,11 @@ function _openx_settings_cookie_vars_clean(&$form, &$form_state) {
 
 function _openx_settings_del_variable(&$form, &$form_state) {
   unset($form_state['site_vars'][$form_state['clicked_button']['#key']]);
+  $form_state['rebuild'] = 1;
+}
+
+function _openx_settings_del_cookie_variable(&$form, &$form_state) {
+  unset($form_state['cookie_vars'][$form_state['clicked_button']['#key']]);
   $form_state['rebuild'] = 1;
 }
 

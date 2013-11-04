@@ -32,8 +32,9 @@ function _openx_javascript() {
   }
   $url = $protocol . '://' . trim($server, '/') . '/spcjs.php';
   
+  $vars = array();
+  $vars['openx_url'] = array('url' => $url);
   if ($site_vars = variable_get('openx_site_vars', FALSE)) {
-    $vars = array();
     if (module_exists('token')) {
       $data = array('global' => NULL, 'user' => $user);
       
@@ -53,11 +54,21 @@ function _openx_javascript() {
         }
       }
     }
+  }
 
-    if (!empty($vars)) {
-      $url .= '?' . drupal_http_build_query($vars);
+  if ($cookie_vars = variable_get('openx_cookie_vars', FALSE)) {
+    $cookies = array();
+    foreach ($cookie_vars as $var) {
+      if (!empty($var['key'])) {
+        $cookies[$var['key']] = $var['value'];
+      }
+    }
+    if (!empty($cookies)) {
+      $vars['cookie'] = $cookies;
     }
   }
+
+  drupal_add_js(array('openx' => $vars), 'setting');
 
   $zones = variable_get('openx_zones', array());
   $script = "  var OA_zones = {\n";
@@ -71,6 +82,8 @@ function _openx_javascript() {
   $script .= implode(",\n", $js_zones);
   $script .= "\n  }";
 
+  drupal_add_js(drupal_get_path('module','openx') . '/openx.js', 'file');
+
   $spc_code = 1;
   drupal_add_html_head(array(
     '#type' => 'html_tag',
@@ -82,12 +95,7 @@ function _openx_javascript() {
     '#weight' => 1000,
   ), 'openx_zones');
 
-  $jsurl = array(
-    'path' => $url,
-  );
-
-	drupal_add_js($url, array('type' => 'external', 'scope' => 'footer', 'weight' => 5), 'setting');
-
+//	drupal_add_js($url, array('type' => 'external', 'scope' => 'footer', 'weight' => 5), 'setting');
   return $url;
 }
 
