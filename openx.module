@@ -113,8 +113,5 @@ function openx_invoke($index_or_key) {
   if(empty($spc_url)) {
     $spc_url = _openx_javascript();
   }
-  
-	//return "<div class='lazyload_ad'><code style='display:none'>OA_show('{$zone['name']}');</code></div>";
-	return "<div class='lazyload_ad'><code style='display:none'>openx_show_ad('{$zone['name']}');</code></div>";
-	//return "<div class='lazyload_ad'><code style='display:none'>Drupal.openx.init.open('{$zone['name']}');</code></div>";
+  return "<div class='openx_lazyload_ad'><code style='display:none'>OA_show('{$zone['name']}');</code></div>";
 }

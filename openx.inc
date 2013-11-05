@@ -17,6 +17,9 @@ function _openx_javascript() {
   global $user;
   static $spc_code;
 
+  // Todo: find out if it is the proper way to add library.
+  drupal_add_library('system','jquery.cookie');
+
   // No need to add the header more than once
   if (!empty($spc_code)) {
     return;
@@ -82,7 +85,6 @@ function _openx_javascript() {
   $script .= implode(",\n", $js_zones);
   $script .= "\n  }";
 
-  drupal_add_js(drupal_get_path('module','openx') . '/openx.js', 'file');
 
   $spc_code = 1;
   drupal_add_html_head(array(
@@ -95,7 +97,7 @@ function _openx_javascript() {
     '#weight' => 1000,
   ), 'openx_zones');
 
-//	drupal_add_js($url, array('type' => 'external', 'scope' => 'footer', 'weight' => 5), 'setting');
+  drupal_add_js(drupal_get_path('module','openx') . '/openx.js', 'file');
   return $url;
 }
 
