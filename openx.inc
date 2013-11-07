@@ -36,7 +36,6 @@ function _openx_javascript() {
   $url = $protocol . '://' . trim($server, '/') . '/spcjs.php';
   
   $vars = array();
-  $vars['openx_url'] = array('url' => $url);
   if ($site_vars = variable_get('openx_site_vars', FALSE)) {
     if (module_exists('token')) {
       $data = array('global' => NULL, 'user' => $user);
@@ -58,9 +57,14 @@ function _openx_javascript() {
       }
     }
   }
+  $stickstr = '?';
+  if (!empty($vars)) {
+    $url .= $stickstr . drupal_http_build_query($vars);
+    $stickstr = '&';
+  }
 
+  $cookies = array();
   if ($cookie_vars = variable_get('openx_cookie_vars', FALSE)) {
-    $cookies = array();
     foreach ($cookie_vars as $var) {
       if (!empty($var['key'])) {
         $cookies[$var['key']] = $var['value'];
@@ -70,8 +74,39 @@ function _openx_javascript() {
       $vars['cookie'] = $cookies;
     }
   }
+  if (!empty($cookies)) {
+    foreach ( $cookies as $cookiekey => $cookievalue) {
+      $url .= $stickstr;
+      $stickstr = '&';
+      $url .= $cookiekey;
+      $url .= '="+';
+      $url .= 'getCookie(\'';
+      $url .= $cookievalue;
+      $url .= "')+\"";
+    }
+  }
+// todo: find a better way to read cookie
+  $script = 'function getCookie(c_name) {';
+  $script .= '    if (document.cookie.length > 0) {';
+  $script .= '     c_start = document.cookie.indexOf(c_name + "=");';
+  $script .= '    if (c_start != -1) {';
+  $script .= '         c_start = c_start + c_name.length + 1;';
+  $script .= '        c_end = document.cookie.indexOf(";", c_start);';
+  $script .= '       if (c_end == -1) {';
+  $script .= '          c_end = document.cookie.length;';
+  $script .= '     }';
+  $script .= '    return unescape(document.cookie.substring(c_start, c_end));';
+  $script .= '     }';
+  $script .= '}';
+  $script .= '   return "";';
+  $script .= '}';
 
-  drupal_add_js(array('openx' => $vars), 'setting');
+  $script .= "document.write(unescape(\"%3Cscript src='";
+  $script .= $url;
+  $script .= "'%3E%3C/script%3E\"));";
+
+  drupal_add_js($script,array('type' => 'inline', 'scope' => 'footer', 'weight' => 5));
+
 
   $zones = variable_get('openx_zones', array());
   $script = "  var OA_zones = {\n";
@@ -97,7 +132,6 @@ function _openx_javascript() {
     '#weight' => 1000,
   ), 'openx_zones');
 
-  drupal_add_js(drupal_get_path('module','openx') . '/openx.js', 'file');
   return $url;
 }
 
