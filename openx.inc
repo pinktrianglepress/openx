@@ -49,7 +49,7 @@ function _openx_javascript() {
     foreach ($site_vars as $var) {
       if (!empty($var['key'])) {
         if (module_exists('token')) {
-          $vars[$var['key']] = token_replace($var['value'], $data);
+          $vars[$var['key']] = token_replace($var['value'], $data, array('clear' => TRUE));
         }
         else {
           $vars[$var['key']] = $var['value'];
