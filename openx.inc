@@ -17,9 +17,6 @@ function _openx_javascript() {
   global $user;
   static $spc_code;
 
-  // Todo: find out if it is the proper way to add library.
-  drupal_add_library('system','jquery.cookie');
-
   // No need to add the header more than once
   if (!empty($spc_code)) {
     return;
@@ -49,7 +46,7 @@ function _openx_javascript() {
     foreach ($site_vars as $var) {
       if (!empty($var['key'])) {
         if (module_exists('token')) {
-          $vars[$var['key']] = token_replace($var['value'], $data);
+          $vars[$var['key']] = token_replace($var['value'], $data, array('clear' => TRUE));
         }
         else {
           $vars[$var['key']] = $var['value'];
