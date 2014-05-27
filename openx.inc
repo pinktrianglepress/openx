@@ -98,7 +98,7 @@ function _openx_javascript() {
   $script .= '   return "";';
   $script .= '}';
 
-  $script .= "document.write(unescape(\"%3Cscript async='true' src='";
+  $script .= "document.write(unescape(\"%3Cscript id='openx_script' src='";
   $script .= $url;
   $script .= "'%3E%3C/script%3E\"));";
 
